@@ -1,10 +1,10 @@
 import { BrowserRouter } from "react-router-dom";
-import Home from "./pages/Home";
+import Interview from "./pages/Interview";
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Home />
+      <Interview />
     </BrowserRouter>
   );
 }
