@@ -1,6 +1,14 @@
 import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    localStorage.setItem("isLoggedIn", "true");
+    navigate("/dashboard");
+  };
+
   return (
     <>
       <Navbar />
@@ -21,7 +29,10 @@ export default function Login() {
             className="w-full border p-3 rounded-lg mb-4"
           />
 
-          <button className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700">
+          <button
+            onClick={handleLogin}
+            className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700"
+          >
             Login
           </button>
         </div>
