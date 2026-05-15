@@ -1,45 +1,50 @@
-import Navbar from "../components/Navbar";
+import { useState } from "react";
 
 export default function Upload() {
+  const [file, setFile] = useState(null);
+  const [message, setMessage] = useState("");
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+    setMessage("");
+  };
+
+  const handleUpload = () => {
+    if (!file) {
+      setMessage("Please select a file first.");
+      return;
+    }
+
+    setMessage(`File "${file.name}" uploaded successfully.`);
+  };
+
   return (
-    <>
-      <Navbar />
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-lg">
+        <h1 className="text-3xl font-bold mb-6 text-center">
+          Upload Resume
+        </h1>
 
-      <div className="min-h-screen bg-gray-100 flex justify-center items-center p-6">
-        <div className="bg-white p-10 rounded-2xl shadow-lg w-full max-w-2xl text-center">
+        <input
+          type="file"
+          accept=".pdf,.doc,.docx"
+          onChange={handleFileChange}
+          className="w-full mb-4"
+        />
 
-          <h1 className="text-4xl font-bold mb-4">
-            Upload Your Resume
-          </h1>
+        <button
+          onClick={handleUpload}
+          className="w-full bg-blue-600 text-white py-3 rounded-lg"
+        >
+          Upload
+        </button>
 
-          <p className="text-gray-600 mb-8">
-            Upload PDF file to analyze ATS score and suggestions
+        {message && (
+          <p className="mt-4 text-center text-blue-600">
+            {message}
           </p>
-
-          <div className="border-2 border-dashed border-blue-400 rounded-2xl p-12 bg-blue-50 mb-6">
-            <p className="text-lg text-gray-700">
-              Drag & Drop Resume Here
-            </p>
-
-            <p className="text-sm text-gray-500 mt-2">
-              Supported Format: PDF
-            </p>
-          </div>
-
-          <input
-            type="file"
-            accept=".pdf"
-            className="mb-6"
-          />
-
-          <br />
-
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700">
-            Upload Resume
-          </button>
-
-        </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }

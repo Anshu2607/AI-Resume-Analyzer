@@ -1,28 +1,49 @@
 import Navbar from "../components/Navbar";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { loginUser } from "../services/authService";
 
 export default function Login() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-  const handleLogin = () => {
-    if (!email || !password) {
-      setError("All fields are required");
-      return;
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const response = await loginUser(formData);
+
+      setMessage(response.message);
+
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userEmail", formData.email);
+
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1000);
+    } catch (error) {
+      setMessage(
+        error.response?.data?.message || "Login failed"
+      );
+    } finally {
+      setLoading(false);
     }
-
-    if (!email.includes("@")) {
-      setError("Enter valid email");
-      return;
-    }
-
-    setError("");
-    localStorage.setItem("isLoggedIn", "true");
-    navigate("/dashboard");
   };
 
   return (
@@ -31,34 +52,52 @@ export default function Login() {
 
       <div className="min-h-screen bg-gray-100 flex justify-center items-center">
         <div className="bg-white p-8 rounded-2xl shadow-lg w-96">
-          <h1 className="text-3xl font-bold text-center mb-6">Login</h1>
+          <h1 className="text-3xl font-bold text-center mb-6">
+            Login
+          </h1>
 
-          {error && (
-            <p className="text-red-500 mb-4 text-sm">{error}</p>
+          {message && (
+            <p className="text-blue-600 mb-4 text-sm text-center">
+              {message}
+            </p>
           )}
 
-          <input
-            type="email"
-            placeholder="Enter Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border p-3 rounded-lg mb-4"
-          />
+          <form onSubmit={handleSubmit}>
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter Email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full border p-3 rounded-lg mb-4"
+              required
+            />
 
-          <input
-            type="password"
-            placeholder="Enter Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border p-3 rounded-lg mb-4"
-          />
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter Password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full border p-3 rounded-lg mb-4"
+              required
+            />
 
-          <button
-            onClick={handleLogin}
-            className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700"
-          >
-            Login
-          </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700"
+            >
+              {loading ? "Logging in..." : "Login"}
+            </button>
+          </form>
+
+          <p className="mt-4 text-center">
+            Don't have an account?{" "}
+            <Link to="/register" className="text-blue-600">
+              Register
+            </Link>
+          </p>
         </div>
       </div>
     </>
