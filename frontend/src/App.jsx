@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Upload from "./pages/Upload";
 
+
 export default function App() {
   return (
     <BrowserRouter>
