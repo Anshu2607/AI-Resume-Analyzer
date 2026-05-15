@@ -6,7 +6,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Upload from "./pages/Upload";
-
+import Analysis from "./pages/Analysis";
 
 export default function App() {
   return (
@@ -25,13 +25,22 @@ export default function App() {
           }
         />
         <Route
-  path="/upload"
-  element={
-    <ProtectedRoute>
-      <Upload />
-    </ProtectedRoute>
-  }
-/>
+          path="/upload"
+          element={
+            <ProtectedRoute>
+              <Upload />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/analysis"
+          element={
+            <ProtectedRoute>
+              <Analysis />
+            </ProtectedRoute>
+          }
+        />
+        
       </Routes>
     </BrowserRouter>
   );

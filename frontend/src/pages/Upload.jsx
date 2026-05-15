@@ -1,22 +1,53 @@
 import Navbar from "../components/Navbar";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { uploadResume } from "../services/authService";
 
 export default function Upload() {
+  const navigate = useNavigate();
+
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
     setMessage("");
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!file) {
       setMessage("Please select a file first.");
       return;
     }
 
-    setMessage(`File "${file.name}" uploaded successfully.`);
+    try {
+      setLoading(true);
+      setMessage("");
+
+      // Send file to backend
+      const response = await uploadResume(file);
+
+      // Show backend success message
+      setMessage(response.message);
+
+      // Save complete analysis response for Analysis page
+      localStorage.setItem(
+        "analysisData",
+        JSON.stringify(response)
+      );
+
+      // Redirect to analysis page after 1.5 seconds
+      setTimeout(() => {
+        navigate("/analysis");
+      }, 1500);
+    } catch (error) {
+      setMessage(
+        error.response?.data?.message || "Upload failed."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,9 +69,10 @@ export default function Upload() {
 
           <button
             onClick={handleUpload}
-            className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 disabled:opacity-50"
           >
-            Upload
+            {loading ? "Uploading..." : "Upload"}
           </button>
 
           {message && (
