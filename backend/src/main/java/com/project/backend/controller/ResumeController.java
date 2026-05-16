@@ -33,7 +33,7 @@ public class ResumeController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // Check if file is selected
+            // Validate file
             if (file.isEmpty()) {
                 response.put("message", "No file selected.");
                 return ResponseEntity.badRequest().body(response);
@@ -41,7 +41,7 @@ public class ResumeController {
 
             String extractedText = "";
 
-            // Extract text only for PDF files
+            // Extract text from PDF files
             if (file.getOriginalFilename() != null &&
                     file.getOriginalFilename().toLowerCase().endsWith(".pdf")) {
 
@@ -55,10 +55,10 @@ public class ResumeController {
                 document.close();
             }
 
-            // Calculate resume score
+            // Calculate score
             int score = calculateScore(extractedText);
 
-            // Feedback lists
+            // Static analysis feedback
             List<String> strengths = Arrays.asList(
                     "Resume text extracted successfully",
                     "Projects section detected",
@@ -96,7 +96,7 @@ public class ResumeController {
             response.put("improvements", improvements);
             response.put("suggestedSkills", suggestedSkills);
 
-            // Save analysis to database
+            // Save analysis result to database
             AnalysisResult result = new AnalysisResult();
             result.setFileName(file.getOriginalFilename());
             result.setScore(score);
@@ -122,6 +122,27 @@ public class ResumeController {
                 analysisResultRepository.findAll();
 
         return ResponseEntity.ok(history);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteAnalysis(
+            @PathVariable Long id) {
+
+        Map<String, String> response = new HashMap<>();
+
+        if (!analysisResultRepository.existsById(id)) {
+            response.put("message", "Analysis record not found.");
+            return ResponseEntity.notFound().build();
+        }
+
+        analysisResultRepository.deleteById(id);
+
+        response.put(
+                "message",
+                "Analysis record deleted successfully."
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     private int calculateScore(String text) {

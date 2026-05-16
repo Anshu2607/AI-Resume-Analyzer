@@ -35,3 +35,10 @@ export const getAnalysisHistory = async () => {
   );
   return response.data;
 };
+
+export const deleteAnalysis = async (id) => {
+  const response = await axios.delete(
+    `http://localhost:8081/api/resume/${id}`
+  );
+  return response.data;
+};
