@@ -1,5 +1,5 @@
 package com.project.backend.controller;
-
+import java.util.List;
 import com.project.backend.entity.AnalysisResult;
 import com.project.backend.repository.AnalysisResultRepository;
 import org.apache.pdfbox.Loader;
@@ -42,7 +42,7 @@ public class ResumeController {
 
             // Extract text only for PDF files
             if (file.getOriginalFilename() != null &&
-                file.getOriginalFilename().toLowerCase().endsWith(".pdf")) {
+                    file.getOriginalFilename().toLowerCase().endsWith(".pdf")) {
 
                 InputStream inputStream = file.getInputStream();
                 PDDocument document = Loader.loadPDF(inputStream.readAllBytes());
@@ -60,35 +60,30 @@ public class ResumeController {
             java.util.List<String> strengths = Arrays.asList(
                     "Resume text extracted successfully",
                     "Projects section detected",
-                    "Technical skills identified"
-            );
+                    "Technical skills identified");
 
             java.util.List<String> improvements = Arrays.asList(
                     "Add more quantified achievements",
                     "Optimize keyword usage",
-                    "Improve ATS readability"
-            );
+                    "Improve ATS readability");
 
             java.util.List<String> suggestedSkills = Arrays.asList(
                     "Spring Boot",
                     "Docker",
                     "AWS",
-                    "Kubernetes"
-            );
+                    "Kubernetes");
 
             // Build API response
             response.put(
                     "message",
-                    "File '" + file.getOriginalFilename() + "' uploaded successfully."
-            );
+                    "File '" + file.getOriginalFilename() + "' uploaded successfully.");
             response.put("score", score);
 
             response.put(
                     "extractedText",
                     extractedText.length() > 1000
                             ? extractedText.substring(0, 1000)
-                            : extractedText
-            );
+                            : extractedText);
 
             response.put("strengths", strengths);
             response.put("improvements", improvements);
@@ -119,19 +114,36 @@ public class ResumeController {
         int score = 0;
 
         // Section checks
-        if (lower.contains("skills")) score += 15;
-        if (lower.contains("projects")) score += 15;
-        if (lower.contains("experience")) score += 15;
-        if (lower.contains("education")) score += 10;
+        if (lower.contains("skills"))
+            score += 15;
+        if (lower.contains("projects"))
+            score += 15;
+        if (lower.contains("experience"))
+            score += 15;
+        if (lower.contains("education"))
+            score += 10;
 
         // Technical keywords
-        if (lower.contains("java")) score += 10;
-        if (lower.contains("spring")) score += 10;
-        if (lower.contains("react")) score += 10;
-        if (lower.contains("sql")) score += 5;
-        if (lower.contains("docker")) score += 5;
-        if (lower.contains("aws")) score += 5;
+        if (lower.contains("java"))
+            score += 10;
+        if (lower.contains("spring"))
+            score += 10;
+        if (lower.contains("react"))
+            score += 10;
+        if (lower.contains("sql"))
+            score += 5;
+        if (lower.contains("docker"))
+            score += 5;
+        if (lower.contains("aws"))
+            score += 5;
 
         return Math.min(score, 100);
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<List<AnalysisResult>> getAnalysisHistory() {
+        List<AnalysisResult> history = analysisResultRepository.findAll();
+
+        return ResponseEntity.ok(history);
     }
 }
