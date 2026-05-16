@@ -1,6 +1,8 @@
 package com.project.backend.entity;
 
 import jakarta.persistence.*;
+import com.project.backend.entity.AnalysisResult;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 @Entity
 @Table(name = "analysis_results")
@@ -84,4 +86,8 @@ public class AnalysisResult {
     public void setSuggestedSkills(String suggestedSkills) {
         this.suggestedSkills = suggestedSkills;
     }
+
+    public interface AnalysisResultRepository
+        extends JpaRepository<AnalysisResult, Long> {
+}
 }
