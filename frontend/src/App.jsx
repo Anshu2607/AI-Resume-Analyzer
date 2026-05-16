@@ -7,7 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Upload from "./pages/Upload";
 import Analysis from "./pages/Analysis";
-
+import History from "./pages/History";
 export default function App() {
   return (
     <BrowserRouter>
@@ -40,7 +40,14 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        
+        <Route
+  path="/history"
+  element={
+    <ProtectedRoute>
+      <History />
+    </ProtectedRoute>
+  }
+/>
       </Routes>
     </BrowserRouter>
   );

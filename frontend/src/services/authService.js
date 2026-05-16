@@ -28,3 +28,10 @@ export const uploadResume = async (file) => {
 
   return response.data;
 };
+
+export const getAnalysisHistory = async () => {
+  const response = await axios.get(
+    "http://localhost:8081/api/resume/history"
+  );
+  return response.data;
+};

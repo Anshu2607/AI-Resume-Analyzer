@@ -1,4 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const email = localStorage.getItem("userEmail");
@@ -26,13 +27,21 @@ export default function Dashboard() {
         Welcome, <span className="font-semibold">{email}</span>
       </p>
       <div className="mt-6">
-  <Link
-    to="/upload"
-    className="bg-blue-600 text-white px-6 py-3 rounded-lg"
-  >
-    Upload Resume
-  </Link>
-</div>
+        <Link
+          to="/upload"
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg"
+        >
+          Upload Resume
+        </Link>
+      </div>
+      <div className="mt-4">
+        <Link
+          to="/history"
+          className="bg-green-600 text-white px-6 py-3 rounded-lg"
+        >
+          View Analysis History
+        </Link>
+      </div>
     </div>
   );
 }
