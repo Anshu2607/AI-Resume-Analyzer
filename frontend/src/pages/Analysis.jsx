@@ -9,33 +9,40 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import {
+  Download,
+  CheckCircle2,
+  AlertTriangle,
+  Lightbulb,
+  Briefcase,
+} from "lucide-react";
 
 export default function Analysis() {
   const storedData = localStorage.getItem("analysisData");
 
-  // If no analysis data is available
   if (!storedData) {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-          <p className="text-2xl font-semibold">
-            No analysis data found.
-          </p>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-2xl shadow-md text-center">
+            <p className="text-2xl font-semibold">
+              No analysis data found.
+            </p>
+          </div>
         </div>
       </>
     );
   }
 
-  // Parse analysis data from localStorage
   const analysis = JSON.parse(storedData);
 
-  // State for Job Description Matching
-  const [jobDescription, setJobDescription] = useState("");
+  const [jobDescription, setJobDescription] =
+    useState("");
   const [matchScore, setMatchScore] = useState(null);
-  const [missingKeywords, setMissingKeywords] = useState([]);
+  const [missingKeywords, setMissingKeywords] =
+    useState([]);
 
-  // Data for score visualization chart
   const chartData = [
     {
       name: "Resume Score",
@@ -43,7 +50,6 @@ export default function Analysis() {
     },
   ];
 
-  // Download analysis report as PDF
   const downloadPDF = () => {
     const doc = new jsPDF();
     let y = 20;
@@ -55,45 +61,19 @@ export default function Analysis() {
     doc.setFontSize(14);
     doc.text(`Overall Score: ${analysis.score}/100`, 20, y);
 
-    y += 20;
-    doc.text("Strengths:", 20, y);
-    y += 10;
-    analysis.strengths.forEach((item) => {
-      doc.text(`- ${item}`, 25, y);
-      y += 8;
-    });
-
-    y += 10;
-    doc.text("Areas for Improvement:", 20, y);
-    y += 10;
-    analysis.improvements.forEach((item) => {
-      doc.text(`- ${item}`, 25, y);
-      y += 8;
-    });
-
-    y += 10;
-    doc.text("Suggested Skills:", 20, y);
-    y += 10;
-    analysis.suggestedSkills.forEach((skill) => {
-      doc.text(`- ${skill}`, 25, y);
-      y += 8;
-    });
-
-    if (matchScore !== null) {
-      y += 10;
-      doc.text(`Job Match Score: ${matchScore}%`, 20, y);
-    }
-
     doc.save("resume-analysis-report.pdf");
   };
 
-  // Calculate Job Description Match Score
   const calculateMatch = () => {
-    if (!analysis.extractedText || !jobDescription.trim()) {
+    if (
+      !analysis.extractedText ||
+      !jobDescription.trim()
+    ) {
       return;
     }
 
-    const resumeText = analysis.extractedText.toLowerCase();
+    const resumeText =
+      analysis.extractedText.toLowerCase();
 
     const jobWords = jobDescription
       .toLowerCase()
@@ -101,10 +81,6 @@ export default function Analysis() {
       .filter((word) => word.length > 3);
 
     const uniqueWords = [...new Set(jobWords)];
-
-    if (uniqueWords.length === 0) {
-      return;
-    }
 
     let matched = 0;
     const missing = [];
@@ -117,48 +93,85 @@ export default function Analysis() {
       }
     });
 
-    const score = Math.round(
-      (matched / uniqueWords.length) * 100
-    );
+    const score =
+      uniqueWords.length > 0
+        ? Math.round(
+            (matched / uniqueWords.length) * 100
+          )
+        : 0;
 
     setMatchScore(score);
     setMissingKeywords(missing.slice(0, 20));
   };
 
+  const SectionCard = ({
+    title,
+    icon: Icon,
+    iconClass,
+    items,
+  }) => (
+    <div className="bg-white p-6 rounded-2xl shadow-md">
+      <div className="flex items-center gap-3 mb-4">
+        <Icon className={iconClass} size={24} />
+        <h2 className="text-2xl font-bold">{title}</h2>
+      </div>
+
+      <ul className="space-y-3">
+        {items.map((item, index) => (
+          <li
+            key={index}
+            className="text-gray-700"
+          >
+            • {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+
   return (
     <>
       <Navbar />
 
-      <div className="min-h-screen bg-gray-100 p-8">
-        <div className="max-w-6xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
-          {/* Page Title */}
-          <h1 className="text-4xl font-bold text-center mb-8">
-            Resume Analysis Report
-          </h1>
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-3xl shadow-lg mb-8">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div>
+                <h1 className="text-4xl font-bold mb-2">
+                  Resume Analysis Report
+                </h1>
+                <p className="text-blue-100">
+                  Detailed ATS insights and recommendations.
+                </p>
+              </div>
 
-          {/* Download PDF Button */}
-          <div className="text-center mb-6">
+              <div className="text-center">
+                <p className="text-blue-100 text-sm">
+                  Overall Score
+                </p>
+                <p className="text-5xl font-bold">
+                  {analysis.score}/100
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Download Button */}
+          <div className="mb-6">
             <button
               onClick={downloadPDF}
-              className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
+              className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition"
             >
+              <Download size={20} />
               Download PDF Report
             </button>
           </div>
 
-          {/* Overall Score */}
-          <div className="text-center mb-10">
-            <p className="text-2xl font-semibold">
-              Overall Score
-            </p>
-            <p className="text-6xl font-bold text-blue-600 mt-2">
-              {analysis.score}/100
-            </p>
-          </div>
-
           {/* Score Chart */}
-          <div className="mb-10">
-            <h2 className="text-2xl font-bold mb-4 text-center">
+          <div className="bg-white p-6 rounded-2xl shadow-md mb-8">
+            <h2 className="text-2xl font-bold mb-6">
               Score Visualization
             </h2>
 
@@ -178,10 +191,16 @@ export default function Analysis() {
           </div>
 
           {/* Job Description Matching */}
-          <div className="mb-10">
-            <h2 className="text-2xl font-bold mb-4">
-              Job Description Matching
-            </h2>
+          <div className="bg-white p-6 rounded-2xl shadow-md mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Briefcase
+                className="text-purple-600"
+                size={24}
+              />
+              <h2 className="text-2xl font-bold">
+                Job Description Matching
+              </h2>
+            </div>
 
             <textarea
               rows="8"
@@ -190,12 +209,12 @@ export default function Analysis() {
                 setJobDescription(e.target.value)
               }
               placeholder="Paste job description here..."
-              className="w-full border p-4 rounded-lg mb-4"
+              className="w-full border rounded-xl p-4 mb-4"
             />
 
             <button
               onClick={calculateMatch}
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700"
+              className="bg-purple-600 text-white px-6 py-3 rounded-xl hover:bg-purple-700 transition"
             >
               Calculate Match Score
             </button>
@@ -207,89 +226,59 @@ export default function Analysis() {
                 </p>
 
                 {missingKeywords.length > 0 && (
-                  <>
-                    <h3 className="text-xl font-bold mb-2">
-                      Missing Keywords
-                    </h3>
-
-                    <div className="flex flex-wrap gap-2">
-                      {missingKeywords.map(
-                        (word, index) => (
-                          <span
-                            key={index}
-                            className="bg-red-100 text-red-700 px-3 py-1 rounded-full"
-                          >
-                            {word}
-                          </span>
-                        )
-                      )}
-                    </div>
-                  </>
+                  <div className="flex flex-wrap gap-2">
+                    {missingKeywords.map(
+                      (word, index) => (
+                        <span
+                          key={index}
+                          className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm"
+                        >
+                          {word}
+                        </span>
+                      )
+                    )}
+                  </div>
                 )}
               </div>
             )}
           </div>
 
-          {/* Extracted Resume Text */}
+          {/* Strengths / Improvements / Skills */}
+          <div className="grid lg:grid-cols-3 gap-6 mb-8">
+            <SectionCard
+              title="Strengths"
+              icon={CheckCircle2}
+              iconClass="text-green-600"
+              items={analysis.strengths}
+            />
+
+            <SectionCard
+              title="Improvements"
+              icon={AlertTriangle}
+              iconClass="text-yellow-600"
+              items={analysis.improvements}
+            />
+
+            <SectionCard
+              title="Suggested Skills"
+              icon={Lightbulb}
+              iconClass="text-blue-600"
+              items={analysis.suggestedSkills}
+            />
+          </div>
+
+          {/* Extracted Text */}
           {analysis.extractedText && (
-            <div className="mb-8">
+            <div className="bg-white p-6 rounded-2xl shadow-md">
               <h2 className="text-2xl font-bold mb-4">
                 Extracted Resume Text
               </h2>
 
-              <div className="bg-gray-100 p-4 rounded-lg max-h-80 overflow-y-auto whitespace-pre-wrap text-sm">
+              <div className="bg-gray-50 p-4 rounded-xl max-h-96 overflow-y-auto whitespace-pre-wrap text-sm text-gray-700">
                 {analysis.extractedText}
               </div>
             </div>
           )}
-
-          {/* Strengths */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-4">
-              Strengths
-            </h2>
-
-            <ul className="list-disc ml-6 space-y-2">
-              {analysis.strengths.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Areas for Improvement */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-4">
-              Areas for Improvement
-            </h2>
-
-            <ul className="list-disc ml-6 space-y-2">
-              {analysis.improvements.map(
-                (item, index) => (
-                  <li key={index}>{item}</li>
-                )
-              )}
-            </ul>
-          </div>
-
-          {/* Suggested Skills */}
-          <div>
-            <h2 className="text-2xl font-bold mb-4">
-              Suggested Skills
-            </h2>
-
-            <div className="flex flex-wrap gap-3">
-              {analysis.suggestedSkills.map(
-                (skill, index) => (
-                  <span
-                    key={index}
-                    className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full"
-                  >
-                    {skill}
-                  </span>
-                )
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </>
