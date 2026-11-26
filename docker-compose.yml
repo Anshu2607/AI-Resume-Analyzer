@@ -1,0 +1,149 @@
+name: careerlens-ai
+
+services:
+
+  # =====================================
+  # REDIS SERVICE
+  # =====================================
+
+  redis:
+    image: redis:7.4-alpine
+
+    container_name: careerlens-docker-redis
+
+    restart: unless-stopped
+
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Redis password is required}
+
+    command:
+      - sh
+      - -c
+      - exec redis-server --appendonly yes --maxmemory-policy noeviction --requirepass "$$REDIS_PASSWORD"
+
+    volumes:
+      - redis_data:/data
+
+    networks:
+      - careerlens-network
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - REDISCLI_AUTH="$$REDIS_PASSWORD" redis-cli ping | grep -q PONG
+
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # =====================================
+  # BACKEND SERVICE
+  # =====================================
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    image: careerlens-backend:1.0.0
+
+    container_name: careerlens-docker-backend
+
+    restart: unless-stopped
+
+    env_file:
+      - ./backend/.env
+
+    environment:
+      NODE_ENV: production
+
+      DEPLOYMENT_MODE: local-docker
+
+      TRUSTED_PROXY: "172.30.50.10"
+
+      PORT: 5000
+
+      CLIENT_URL: ${CLIENT_URL:?Frontend origin is required}
+
+      REDIS_HOST: redis
+
+      REDIS_PORT: 6379
+
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Redis password is required}
+
+      REDIS_DB: 0
+
+      QUEUE_PREFIX: careerlens
+
+      LOG_LEVEL: info
+
+      HF_HOME: /app/cache
+
+    expose:
+      - "5000"
+
+    volumes:
+      - model_cache:/app/cache
+      - backend_uploads:/app/uploads
+
+    depends_on:
+      redis:
+        condition: service_healthy
+
+    networks:
+      - careerlens-network
+
+    stop_grace_period: 130s
+
+  # =====================================
+  # FRONTEND SERVICE
+  # =====================================
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+      args:
+        VITE_API_BASE_URL: /api/v1
+
+    image: careerlens-frontend:1.0.0
+
+    container_name: careerlens-docker-frontend
+
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:3000:80"
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    networks:
+      careerlens-network:
+        ipv4_address: 172.30.50.10
+
+# =====================================
+# PERSISTENT VOLUMES
+# =====================================
+
+volumes:
+  redis_data:
+
+  model_cache:
+
+  backend_uploads:
+
+# =====================================
+# DOCKER NETWORK
+# =====================================
+
+networks:
+  careerlens-network:
+    driver: bridge
+
+    ipam:
+      config:
+        - subnet: 172.30.50.0/24
