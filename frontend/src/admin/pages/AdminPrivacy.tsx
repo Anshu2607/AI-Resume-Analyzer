@@ -322,7 +322,7 @@ export default function AdminPrivacy() {
 
               </div>
 
-              <div className="min-w-[180px] flex-1">
+              <div className="min-w-45 flex-1">
 
                 <h3 className="font-medium text-white">
 

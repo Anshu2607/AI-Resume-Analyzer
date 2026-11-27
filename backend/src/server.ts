@@ -1,4 +1,4 @@
-import dns from "node:dns";
+
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 
@@ -31,7 +31,6 @@ try {
   process.exit(1);
 }
 
-dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 // =====================================
 // SERVER CONFIGURATION
