@@ -2,6 +2,8 @@
 
 ### AI-Powered Career Intelligence & Resume Optimization Platform
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_Website-22c55e?style=for-the-badge&logo=vercel)](https://ai-resume-analyzer-gtwt.vercel.app/)
+
 CareerLens AI is a full-stack, AI-powered career development platform designed to help students and professionals analyze resumes, identify skill gaps, prepare for interviews, and build personalized career development strategies.
 
 ## Key Features
